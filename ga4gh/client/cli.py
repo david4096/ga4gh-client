@@ -63,12 +63,12 @@ class AbstractQueryRunner(object):
     """
     def __init__(self, args):
         self._key = args.key
-        self._id_token = args.id_token
+        self._auth0_token = args.auth0_token
         self._client = client.HttpClient(
             args.baseUrl,
             verbosityToLogLevel(args.verbose),
             self._key,
-            self._id_token)
+            self._auth0_token)
 
 
 class FormattedOutputRunner(AbstractQueryRunner):
@@ -1208,7 +1208,7 @@ def addClientGlobalOptions(parser):
         "--key", "-k", default='invalid',
         help="Auth Key. Found on server index page.")
     parser.add_argument(
-        "--id_token", "-t", default=None,
+        "--auth0-token", "-t", default=None,
         help="A token generated using Auth0 login.")
     addDisableUrllibWarningsArgument(parser)
     addVersionArgument(parser)

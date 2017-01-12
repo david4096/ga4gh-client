@@ -505,7 +505,7 @@ class AnnotationFormatterMixin(object):
                 print(effect.alternate_bases, sep="|", end="|")
                 for so in effect.effects:
                     print(so.term, sep="&", end="|")
-                    print(so.id, sep="&", end="|")
+                    print(so.term_id, sep="&", end="|")
                 print(effect.hgvs_annotation.transcript,
                       effect.hgvs_annotation.protein, sep="|", end="\t")
             print()
@@ -583,7 +583,7 @@ class SearchVariantAnnotationsRunner(
             self._effects = []
             for eff in args.effects.split(","):
                 term = protocol.OntologyTerm()
-                term.id = eff
+                term.term_id = eff
                 self._effects.append(term)
 
     def _run(self, variantAnnotationSetId):

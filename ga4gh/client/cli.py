@@ -40,7 +40,6 @@ def addVersionArgument(parser):
     parser.add_argument(
         "--version", version=versionString, action="version")
 
-
 ###############
 # Client
 ###############
@@ -64,8 +63,12 @@ class AbstractQueryRunner(object):
     """
     def __init__(self, args):
         self._key = args.key
+        self._auth0_token = args.auth0_token
         self._client = client.HttpClient(
-            args.baseUrl, verbosityToLogLevel(args.verbose), self._key)
+            args.baseUrl,
+            verbosityToLogLevel(args.verbose),
+            self._key,
+            self._auth0_token)
 
 
 class FormattedOutputRunner(AbstractQueryRunner):
@@ -737,9 +740,9 @@ class SearchRnaQuantificationsRunner(AbstractSearchRunner):
             print(
                 rnaQuant.id, rnaQuant.description, rnaQuant.name,
                 sep="\t", end="\t")
-            for featureSet in rnaQuant.featureSetIds:
+            for featureSet in rnaQuant.feature_set_ids:
                 print(featureSet, sep=",", end="\t")
-            for readGroup in rnaQuant.readGroupIds:
+            for readGroup in rnaQuant.read_group_ids:
                 print(readGroup, sep=",", end="")
             print()
 
@@ -767,7 +770,7 @@ class SearchExpressionLevelsRunner(AbstractSearchRunner):
         for expression in expressionObjs:
             print(
                 expression.id, expression.expression, expression.name,
-                expression.isNormalized, expression.rawReadCount,
+                expression.is_normalized, expression.raw_read_count,
                 expression.score, expression.units, sep="\t", end="\t")
             print()
 
@@ -1206,6 +1209,9 @@ def addClientGlobalOptions(parser):
     parser.add_argument(
         "--key", "-k", default='invalid',
         help="Auth Key. Found on server index page.")
+    parser.add_argument(
+        "--auth0-token", "-t", default=None,
+        help="A token generated using Auth0 login.")
     addDisableUrllibWarningsArgument(parser)
     addVersionArgument(parser)
 

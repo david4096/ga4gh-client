@@ -274,6 +274,7 @@ class AbstractClient(object):
     def get_rna_quantification_set(self, rna_quantification_set_id):
         """
         Returns the RnaQuantificationSet with the specified ID from the server.
+
         :param str rna_quantification_set_id: The ID of the
             RnaQuantificationSet of interest.
         :return: The RnaQuantificationSet of interest.
@@ -286,6 +287,7 @@ class AbstractClient(object):
     def get_rna_quantification(self, rna_quantification_id):
         """
         Returns the RnaQuantification with the specified ID from the server.
+
         :param str rna_quantification_id: The ID of the RnaQuantification of
             interest.
         :return: The RnaQuantification of interest.
@@ -298,6 +300,7 @@ class AbstractClient(object):
     def get_expression_level(self, expression_level_id):
         """
         Returns the ExpressionLevel with the specified ID from the server.
+
         :param str expression_level_id: The ID of the ExpressionLevel of
             interest.
         :return: The ExpressionLevel of interest.
@@ -378,7 +381,7 @@ class AbstractClient(object):
         for effect in effects:
             request.effects.add().CopyFrom(protocol.OntologyTerm(**effect))
         for effect in request.effects:
-            if not effect.id:
+            if not effect.term_id:
                 raise exceptions.ErrantRequestException(
                     "Each ontology term should have an id set")
         request.page_size = pb.int(self._page_size)
@@ -759,14 +762,18 @@ class HttpClient(AbstractClient):
         the :mod:`logging` module. This is :data:`logging.WARNING` by default.
     :param str authentication_key: The authentication key provided by the
         server after logging in.
+    :param str id_token: The Auth0 id_token key provided by the
+        server after logging in.
     """
 
     def __init__(
             self, url_prefix, logLevel=logging.WARNING,
-            authentication_key=None):
+            authentication_key=None,
+            id_token=None):
         super(HttpClient, self).__init__(logLevel)
         self._url_prefix = url_prefix
         self._authentication_key = authentication_key
+        self._id_token = id_token
         self._session = requests.Session()
         self._setup_http_session()
         requests_log = logging.getLogger("requests.packages.urllib3")
@@ -778,6 +785,9 @@ class HttpClient(AbstractClient):
         Sets up the common HTTP session parameters used by requests.
         """
         headers = {"Content-type": "application/json"}
+        if (self._id_token):
+            headers.update({"authorization": "Bearer {}".format(
+                self._id_token)})
         self._session.headers.update(headers)
         # TODO is this unsafe????
         self._session.verify = False
